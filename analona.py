@@ -1,15 +1,33 @@
 from schema import Schema, And, Or, Use, Optional, SchemaError
 from dateutil import parser
 
+class Validator(object):
+    """
+    General validtor object
+    """
+    def __init__(self, item, schema):
+        self.item = item
+        self.schema = schema
 
-class Ship(object):
+    def run_schema(self, data):
+        return(self.schema.validate(data))
+
+    def validate_item(self):
+        try:
+            self.run_schema(self.item)
+        except SchemaError as x:
+            return x.code
+        else:
+            return self.item
+
+class Ship(Validator):
     """
     Ship validator
     """
     def __init__(self, ship):
-        self.ship = ship
+        Validator.__init__(self, ship, self.create_schema())
 
-    def run_schema(self, data):
+    def create_schema(self):
         return (
             Schema({
                 '_id': Or(str, Use(int)),
@@ -26,26 +44,21 @@ class Ship(object):
                 Optional('width'): Or(float, int),
                 Optional('direction'): And(Use(float), lambda s: 0 <= s <= 360, error="direction: should be between 0-360"),
                 Optional('AISIdentifier'): Or(str, int)
-            }).validate(data)
+            })
         )
 
     def validate(self):
-        try:
-            self.run_schema(self.ship)
-        except SchemaError as x:
-            return x.code
-        else:
-            return self.ship
+        return self.validate_item()
 
 
-class Plane(object):
+class Plane(Validator):
     """
     Airplane Validator
     """
     def __init__(self, plane):
-        self.plane = plane
+        Validator.__init__(self, plane, self.create_schema())
 
-    def run_schema(self, data):
+    def create_schema(self):
         return (
             Schema({
                 '_id': Or(str, Use(int)),
@@ -61,13 +74,10 @@ class Plane(object):
                 Optional('length'): Or(float, int),
                 Optional('width'): Or(float, int),
                 Optional('direction'): And(Use(float), lambda s: 0 <= s <= 360, error="direction: should be between 0-360")
-            }).validate(data)
+            })
         )
 
     def validate(self):
-        try:
-            self.run_schema(self.plane)
-        except SchemaError as x:
-            return x.code
-        else:
-            return self.plane
+        return self.validate_item()
+
+
