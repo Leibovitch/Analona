@@ -9,26 +9,32 @@ class Validator(object):
         self.item = item
         self.schema = schema
 
-    def run_schema(self, data):
-        return(self.schema.validate(data))
-
-    def validate_schema(self):
+    def validate(self):
         try:
-            self.run_schema(self.item)
+            self.schema.validate(self.item)
         except SchemaError as x:
             return x.code
         else:
-            return self.item
+            return True
+
+    def get_schema(self):
+        # each child class should implement this method
+        return ({})
+
+    def compose_schema(self):
+        # if a child class want to extend schema is should override this method
+        schema = self.get_schema()
+        return Schema(schema)
 
 
-class BaseItem(Validator):
+class BaseObject(Validator):
     """
     General valiator for single item (Ship/Plane)
     """
-    def __init__(self, item, extended_schema):
-        Validator.__init__(self, item, self.compose_schema(extended_schema))
+    def __init__(self, item):
+        Validator.__init__(self, item, self.compose_schema())
     
-    def get_basic_schema(self):
+    def get_schema(self):
         return ({
             '_id': Or(str, Use(int)),
             'company': str,
@@ -36,7 +42,7 @@ class BaseItem(Validator):
                 'coordinates': list,
                 'type': Or("Point", "Polygon", error="geometry type: should be Point or Polygon")
             },
-            'sourceItem': And(str, len),
+            'originalImageId': And(str, len),
             'observed': Use(parser.parse),
             'area': Or(float, int),
             Optional('score'): And(Use(float), lambda s: 0 <= s <= 1,error="score: should be between 0-1"),
@@ -44,49 +50,35 @@ class BaseItem(Validator):
             Optional('width'): Or(float, int),
             Optional('direction'): And(Use(float), lambda s: 0 <= s <= 360, error="direction: should be between 0-360")
         })
-    
-    def compose_schema(self, extended_schema):
-        schema = self.get_basic_schema() 
-        schema.update(extended_schema)
-        return Schema(schema)
-
-    def validate_item(self):
-        return self.validate_schema()
 
 
-class Ship(BaseItem):
+class Ship(BaseObject):
     """
     Ship validator
     """
     def __init__(self, ship):
-        BaseItem.__init__(self, ship, self.create_extended_schema())
-
-    def create_extended_schema(self):
-        return ({
+        BaseObject.__init__(self, ship)
+    
+    def compose_schema(self):
+        schema = self.get_schema()
+        additional_parameters = {
             Optional('AISIdentifier'): Or(str, int)
-        })
+        } 
+        schema.update(additional_parameters)
+        return Schema(schema)
 
-    def validate(self):
-        return self.validate_item()
-
-
-class Plane(BaseItem):
+class Plane(BaseObject):
     """
     Airplane Validator
     """
     def __init__(self, ship):
-        BaseItem.__init__(self, ship, self.create_extended_schema())
+        BaseObject.__init__(self, ship)
 
-    def create_extended_schema(self):
-        return ({})
-
-    def validate(self):
-        return self.validate_item()
 
 def is_list_of_string(ids):
     is_list = True
     for item in ids:
-        is_list = isinstance(item, str)
+        is_list =  is_list and isinstance(item, str)
     return is_list
 
 
@@ -95,9 +87,9 @@ class BaseMap(Validator):
     General validator for a raster item (Buildings, Roads, Vegetation)
     """
     def __init__(self, item, extended_schema):
-        Validator.__init__(self, item, self.compose_schema(extended_schema))
+        Validator.__init__(self, item, self.compose_schema())
     
-    def get_basic_schema(self):
+    def get_schema(self):
         url_regex = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
         
         return ({
@@ -118,14 +110,6 @@ class BaseMap(Validator):
             ),
             Optional('sourceImagesIds'): And(list, lambda ids: is_list_of_string(ids), error="sourceImagesIds: should be a list")
         })
-    
-    def compose_schema(self, extended_schema):
-        schema = self.get_basic_schema() 
-        schema.update(extended_schema)
-        return Schema(schema)
-
-    def validate_item(self):
-        return self.validate_schema()
 
 
 class Building(BaseMap):
@@ -133,13 +117,7 @@ class Building(BaseMap):
     Building Validator
     """
     def __init__(self, building):
-        BaseMap.__init__(self, building, self.create_extended_schema())
-
-    def create_extended_schema(self):
-        return ({})
-
-    def validate(self):
-        return self.validate_item()
+        BaseMap.__init__(self, building, self.compose_schema())
 
 
 class Road(BaseMap):
@@ -147,10 +125,5 @@ class Road(BaseMap):
     Roads Validator
     """
     def __init__(self, road):
-        BaseMap.__init__(self, road, self.create_extended_schema())
+        BaseMap.__init__(self, road, self.compose_schema())
 
-    def create_extended_schema(self):
-        return ({})
-
-    def validate(self):
-        return self.validate_item()
