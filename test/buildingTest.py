@@ -1,4 +1,9 @@
-from analona import Ship
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir) 
+
+from analona import Building
 
 example = {
     "_id" : "feea0196-b6b9-45a7-a7ba-a67287236e06",
@@ -30,20 +35,21 @@ example = {
         ],
         "type" : "Polygon"
     },
-    "sourceItem" : "20181010_075454_0f2b",
-    "observed" : "2018-10-10T07:54:54.908391Z",
-    "area": 1787.9730195193133,
-    "score": 0.7, 
-    "length": 2000, 
-    "width": 1000,
-    "AISIdentifier": "Aa123"
+    "analyticsUrl" : "http://planet.com/abcd",
+    "provisionTime" : "2018-10-10T07:54:54.908391Z",
+    "sourceImagesIds": ["id_1", "id_2"]
 }
 
-res = Ship(example)
-assert(res.validate() == example)
+res = Building(example)
+assert(res.validate() == True)
 
-bad_score = example
-bad_score["score"] = 1.7
-res = Ship(bad_score)
-assert(res.validate() == "score: should be between 0-1")
+bad_ids = example
+bad_ids["sourceImagesIds"] = [1, "2"]
+res = Building(bad_ids)
+assert(res.validate() == "sourceImagesIds: should be a list")
+
+bad_url = example
+bad_url["analyticsUrl"] = "1234://not.url"
+res = Building(bad_url)
+assert(res.validate() == "analyticsUrl: invalid url")
 

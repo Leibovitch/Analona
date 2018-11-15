@@ -1,4 +1,9 @@
-from analona import Plane
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir) 
+
+from analona import Ship
 
 example = {
     "_id" : "feea0196-b6b9-45a7-a7ba-a67287236e06",
@@ -30,19 +35,20 @@ example = {
         ],
         "type" : "Polygon"
     },
-    "sourceItem" : "20181010_075454_0f2b",
+    "originalImageId" : "20181010_075454_0f2b",
     "observed" : "2018-10-10T07:54:54.908391Z",
     "area": 1787.9730195193133,
     "score": 0.7, 
     "length": 2000, 
-    "width": 1000
+    "width": 1000,
+    "AISIdentifier": "Aa123"
 }
 
-res = Plane(example)
-assert(res.validate() == example)
+res = Ship(example)
+assert(res.validate() == True)
 
 bad_score = example
 bad_score["score"] = 1.7
-res = Plane(bad_score)
+res = Ship(bad_score)
 assert(res.validate() == "score: should be between 0-1")
 

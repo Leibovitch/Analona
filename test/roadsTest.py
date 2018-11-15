@@ -1,4 +1,9 @@
-from analona import Building
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir) 
+
+from analona import Road
 
 example = {
     "_id" : "feea0196-b6b9-45a7-a7ba-a67287236e06",
@@ -35,16 +40,16 @@ example = {
     "sourceImagesIds": ["id_1", "id_2"]
 }
 
-res = Building(example)
-assert(res.validate() == example)
+res = Road(example)
+assert(res.validate() == True)
 
 bad_ids = example
 bad_ids["sourceImagesIds"] = [1, 2]
-res = Building(bad_ids)
+res = Road(bad_ids)
 assert(res.validate() == "sourceImagesIds: should be a list")
 
 bad_url = example
 bad_url["analyticsUrl"] = "1234://not.url"
-res = Building(bad_url)
+res = Road(bad_url)
 assert(res.validate() == "analyticsUrl: invalid url")
 
