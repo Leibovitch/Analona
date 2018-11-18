@@ -62,7 +62,11 @@ class Ship(BaseObject):
     def compose_schema(self):
         schema = self.get_schema()
         additional_parameters = {
-            Optional('AISIdentifier'): Or(str, int)
+            Optional('AISIdentifiers'): {
+                Optional('IMO'): Or(str, int),
+                Optional('IMO'): Or(str, int),
+                Optional('GUID'): Or(str, int)
+            }
         } 
         schema.update(additional_parameters)
         return Schema(schema)
