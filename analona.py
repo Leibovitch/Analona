@@ -79,11 +79,8 @@ class Plane(BaseObject):
         BaseObject.__init__(self, ship)
 
 
-def is_list_of_string(ids):
-    is_list = True
-    for item in ids:
-        is_list =  is_list and isinstance(item, str)
-    return is_list
+def is_list_of_strings(ids):
+    return all([isinstance(item, str) for item in ids])
 
 
 class BaseMap(Validator):
@@ -112,7 +109,7 @@ class BaseMap(Validator):
                 Regex(url_regex),
                 error="sourceImagesUrl: invalid url"
             ),
-            Optional('sourceImagesIds'): And(list, lambda ids: is_list_of_string(ids), error="sourceImagesIds: should be a list")
+            Optional('sourceImagesIds'): And(list, lambda ids: is_list_of_strings(ids), error="sourceImagesIds: should be a list")
         })
 
 
