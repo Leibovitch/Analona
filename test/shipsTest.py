@@ -41,7 +41,9 @@ example = {
     "score": 0.7, 
     "length": 2000, 
     "width": 1000,
-    "AISIdentifier": "Aa123"
+    "AISIdentifiers": {
+        "IMO": "Aa123"
+    }
 }
 
 res = Ship(example)
