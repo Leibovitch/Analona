@@ -101,14 +101,14 @@ class BaseMap(Validator):
                 'type': Or("Point", "Polygon", "MultiPolygon", "MultiPoint", error="geometry type error")
             },
             'provisionTime': Use(parser.parse),
-            Optional('analyticsUrl'): Or(
-                Regex(url_regex),
-                error="analyticsUrl: invalid url"
-            ),
-            Optional('sourceImagesUrl'): Or(
-                Regex(url_regex),
-                error="sourceImagesUrl: invalid url"
-            ),
+            Optional('analyticsInfo'): {
+                "url": Or(Regex(url_regex), error="analyticsInfo: invalid url"),
+                "storage": Or("Azure", "AWS", "GoogleCloud", error="analyticsInfo: unknown storage type")
+            },
+            Optional('sourceImagesInfo'): {
+                "url": Or(Regex(url_regex), error="sourceImagesInfo: invalid url"),
+                "storage": Or("Azure", "AWS", "GoogleCloud", error="sourceImagesInfo: unknown storage type")
+            },
             Optional('sourceImagesIds'): And(list, lambda ids: is_list_of_strings(ids), error="sourceImagesIds: should be a list")
         })
 
