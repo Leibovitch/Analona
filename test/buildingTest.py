@@ -39,7 +39,7 @@ example = {
         "url": "http://planet.com/abcd",
         "storage": "Azure"
     },
-    "provisionTime" : "2018-10-10T07:54:54.908391Z",
+    "analyticsDeliveryTime" : "2018-10-10T07:54:54.908391Z",
     "sourceImagesIds": ["id_1", "id_2"]
 }
 
