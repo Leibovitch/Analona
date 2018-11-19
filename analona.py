@@ -87,7 +87,7 @@ class BaseMap(Validator):
     """
     General validator for a raster item (Buildings, Roads, Vegetation)
     """
-    def __init__(self, item, extended_schema):
+    def __init__(self, item):
         Validator.__init__(self, item, self.compose_schema())
     
     def get_schema(self):
@@ -96,11 +96,11 @@ class BaseMap(Validator):
         return ({
             '_id': Or(str, Use(int)),
             'company': str,
-            Optional('geometry'): {
+            'geometry': {
                 'coordinates': list,
                 'type': Or("Point", "Polygon", "MultiPolygon", "MultiPoint", error="geometry type error")
             },
-            'provisionTime': Use(parser.parse),
+            'analyticsDeliveryTime': Use(parser.parse),
             Optional('analyticsInfo'): {
                 "url": Or(Regex(url_regex), error="analyticsInfo: invalid url"),
                 "storage": Or("Azure", "AWS", "GoogleCloud", error="analyticsInfo: unknown storage type")
@@ -118,7 +118,7 @@ class Building(BaseMap):
     Building Validator
     """
     def __init__(self, building):
-        BaseMap.__init__(self, building, self.compose_schema())
+        BaseMap.__init__(self, building)
 
 
 class Road(BaseMap):
@@ -126,5 +126,5 @@ class Road(BaseMap):
     Roads Validator
     """
     def __init__(self, road):
-        BaseMap.__init__(self, road, self.compose_schema())
+        BaseMap.__init__(self, road)
 
