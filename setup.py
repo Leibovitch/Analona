@@ -4,7 +4,6 @@ import analona
 
 setup(
     name=analona.__name__,
-    version=analona.__version__,
     author="NSPLT",
     description="Analytics Validation scheme",
     keywords="schema json validation",
