@@ -1,5 +1,5 @@
 from schema import Schema, And, Or, Use, Optional, SchemaError, Regex
-from dateutil import parser
+from datetime import datetime
 
 class Validator(object):
     """
@@ -43,7 +43,7 @@ class BaseObject(Validator):
                 'type': Or("Point", "Polygon", error="geometry type: should be Point or Polygon")
             },
             'originalImageId': And(str, len),
-            'observed': Use(parser.parse),
+            'observed': datetime,
             'area': Or(float, int),
             Optional('score'): And(Use(float), lambda s: 0 <= s <= 1,error="score: should be between 0-1"),
             Optional('length'): Or(float, int),
@@ -101,7 +101,7 @@ class BaseMap(Validator):
                 'coordinates': list,
                 'type': Or("Point", "Polygon", "MultiPolygon", "MultiPoint", error="geometry type error")
             },
-            'analyticsDeliveryTime': Use(parser.parse),
+            'analyticsDeliveryTime': datetime,
             Optional('analyticsInfo'): {
                 "url": Or(Regex(url_regex), Regex(storage_regex), error="analyticsInfo: invalid url"),
                 "storage": Or("Azure", "AWS", "GoogleCloud", error="analyticsInfo: unknown storage type")

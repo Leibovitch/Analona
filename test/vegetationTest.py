@@ -1,3 +1,4 @@
+from datetime import datetime
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -39,7 +40,7 @@ example = {
         "url": "gs://spaceknow-customer46-delivery/weekly/aoi-1/r00c06/2018W45/20181115T072837_LANc",
         "storage": "GoogleCloud"
     },
-    "analyticsDeliveryTime" : "2018-10-10T07:54:54.908391Z",
+    "analyticsDeliveryTime" : datetime.strptime("2018-10-10T07:54:54.908391Z","%Y-%m-%dT%H:%M:%S.%fZ"),
     "sourceImagesIds": ["id_1", "id_2"]
 }
 
