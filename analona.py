@@ -92,6 +92,7 @@ class BaseMap(Validator):
     
     def get_schema(self):
         url_regex = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
+        storage_regex = r'(gs|s3)?://[-a-zA-Z0-9@:%._\+~#=]{2,256}/([\w\+~#=-]*/)*'
         
         return ({
             '_id': Or(str, Use(int)),
@@ -102,12 +103,16 @@ class BaseMap(Validator):
             },
             'analyticsDeliveryTime': Use(parser.parse),
             Optional('analyticsInfo'): {
-                "url": Or(Regex(url_regex), error="analyticsInfo: invalid url"),
+                "url": Or(Regex(url_regex), Regex(storage_regex), error="analyticsInfo: invalid url"),
                 "storage": Or("Azure", "AWS", "GoogleCloud", error="analyticsInfo: unknown storage type")
             },
             Optional('sourceImagesInfo'): {
-                "url": Or(Regex(url_regex), error="sourceImagesInfo: invalid url"),
+                "url": Or(Regex(url_regex), Regex(storage_regex), error="sourceImagesInfo: invalid url"),
                 "storage": Or("Azure", "AWS", "GoogleCloud", error="sourceImagesInfo: unknown storage type")
+            },
+            Optional('tileId'): {
+                "row": Or(str, Use(int)),
+                "col": Or(str, Use(int))
             },
             Optional('sourceImagesIds'): And(list, lambda ids: is_list_of_strings(ids), error="sourceImagesIds: should be a list")
         })
@@ -128,3 +133,10 @@ class Road(BaseMap):
     def __init__(self, road):
         BaseMap.__init__(self, road)
 
+
+class Vegetation(BaseMap):
+    """
+    Vegetation Validator
+    """
+    def __init__(self, vegetation):
+        BaseMap.__init__(self, vegetation)
