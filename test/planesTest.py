@@ -1,4 +1,5 @@
 import os,sys,inspect
+from datetime import datetime
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
@@ -36,7 +37,7 @@ example = {
         "type" : "Polygon"
     },
     "originalImageId" : "20181010_075454_0f2b",
-    "observed" : "2018-10-10T07:54:54.908391Z",
+    "observed" :datetime.strptime("2018-10-10T07:54:54.908391Z","%Y-%m-%dT%H:%M:%S.%fZ"),
     "area": 1787.9730195193133,
     "score": 0.7, 
     "length": 2000, 
