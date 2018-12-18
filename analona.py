@@ -93,7 +93,7 @@ class BaseMap(Validator):
     def get_schema(self):
         url_regex = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
         storage_regex = r'(gs|s3)?://[-a-zA-Z0-9@:%._\+~#=]{2,256}/([\w\+~#=-]*/)*'
-        
+
         return ({
             '_id': Or(str, Use(int)),
             'company': str,
@@ -101,7 +101,7 @@ class BaseMap(Validator):
                 'coordinates': list,
                 'type': Or("Point", "Polygon", "MultiPolygon", "MultiPoint", error="geometry type error")
             },
-            'analyticsDeliveryTime': datetime,
+            'analyticsDeliveryTime': Or(datetime, {"start": datetime, "end": datetime}),
             Optional('analyticsInfo'): {
                 "url": Or(Regex(url_regex), Regex(storage_regex), error="analyticsInfo: invalid url"),
                 "storage": Or("Azure", "AWS", "GoogleCloud", error="analyticsInfo: unknown storage type")
