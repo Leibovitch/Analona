@@ -1,0 +1,6 @@
+.vscode
+analona_env
+*.pyc
+build
+dist
+analona.egg-info
