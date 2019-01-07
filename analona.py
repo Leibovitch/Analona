@@ -45,9 +45,9 @@ class BaseObject(Validator):
             'originalImageId': And(str, len),
             'observed': datetime,
             'area': Or(float, int),
+            'length': Or(float, int),
+            'width': Or(float, int),
             Optional('score'): And(Use(float), lambda s: 0 <= s <= 1,error="score: should be between 0-1"),
-            Optional('length'): Or(float, int),
-            Optional('width'): Or(float, int),
             Optional('direction'): And(Use(float), lambda s: 0 <= s <= 360, error="direction: should be between 0-360")
         })
 
