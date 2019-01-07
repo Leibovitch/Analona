@@ -104,7 +104,7 @@ class BaseMap(Validator):
             'analyticsDeliveryTime': Or(datetime, {"start": datetime, "end": datetime}),
             Optional('analyticsInfo'): {
                 "url": Or(Regex(url_regex), Regex(storage_regex), error="analyticsInfo: invalid url"),
-                "storage": Or("Azure", "AWS", "GoogleCloud", error="analyticsInfo: unknown storage type")
+                "storage": Or("Azure", "AWS", "GoogleCloud", "Planet", error="analyticsInfo: unknown storage type")
             },
             Optional('sourceImagesInfo'): {
                 "url": Or(Regex(url_regex), Regex(storage_regex), error="sourceImagesInfo: invalid url"),
