@@ -43,7 +43,8 @@ class BaseObject(Validator):
                 'type': Or("Point", "Polygon", error="geometry type: should be Point or Polygon")
             },
             'originalImageId': And(str, len),
-            'observed': datetime,
+            'observed_start': datetime, 
+            'observed_end': datetime,
             'area': Or(float, int),
             'length': Or(float, int),
             'width': Or(float, int),
@@ -101,7 +102,8 @@ class BaseMap(Validator):
                 'coordinates': list,
                 'type': Or("Point", "Polygon", "MultiPolygon", "MultiPoint", error="geometry type error")
             },
-            'analyticsDeliveryTime': Or(datetime, {"start": datetime, "end": datetime}),
+            'observed_start': datetime,
+            'observed_end': datetime,
             Optional('analyticsInfo'): {
                 "url": Or(Regex(url_regex), Regex(storage_regex), error="analyticsInfo: invalid url"),
                 "storage": Or("Azure", "AWS", "GoogleCloud", "Planet", error="analyticsInfo: unknown storage type")
