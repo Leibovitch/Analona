@@ -7,10 +7,10 @@ sys.path.insert(0, parentdir)
 from analona import Building
 
 example = {
-    "_id" : "feea0196-b6b9-45a7-a7ba-a67287236e06",
+    "_id": "feea0196-b6b9-45a7-a7ba-a67287236e06",
     "company": "Planet",
-    "geometry" : {
-        "coordinates" : [
+    "geometry": {
+        "coordinates": [
             [
                 [
                     32.5088182750295,
@@ -34,13 +34,14 @@ example = {
                 ]
             ]
         ],
-        "type" : "Polygon"
+        "type": "Polygon"
     },
-    "analyticsInfo" : {
+    "analyticsInfo": {
         "url": "http://planet.com/abcd",
         "storage": "Azure"
     },
-    "analyticsDeliveryTime" : datetime.strptime("2018-10-10T07:54:54.908391Z","%Y-%m-%dT%H:%M:%S.%fZ"),
+    "observed_start": datetime.strptime("2018-10-10T07:54:54.908391Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
+    "observed_end": datetime.strptime("2018-10-16T07:54:54.908391Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
     "sourceImagesIds": ["id_1", "id_2"]
 }
 
