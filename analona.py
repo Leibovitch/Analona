@@ -26,31 +26,59 @@ class Validator(object):
         schema = self.get_schema()
         return Schema(schema)
 
+class BaseDetection(Validator): 
+    """
+    General valiator for a single detection (Ship/Plane)
+    """
 
-class BaseObject(Validator):
+    url_regex = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
+    storage_regex = r'(gs|s3)?://[-a-zA-Z0-9@:%._\+~#=]{2,256}/([\w\+~#=-]*/)*'
+
+    def __init__(self, item):
+        Validator.__init__(self, item, self.compose_schema())
+
+
+    def get_schema(self):
+        return ({
+            '_id': Or(str, Use(int)),
+            'company': str,
+            'observed_start': datetime, 
+            'observed_end': datetime,
+            Optional('tileId'): {
+                "row": Or(str, Use(int)),
+                "col": Or(str, Use(int)),
+                "full_id": str
+            },
+            Optional('linkToSourceObjext'): {
+                "url": Or(Regex(BaseDetection.url_regex), Regex(BaseDetection.storage_regex), error="analyticsInfo: invalid url"),
+                "storage": Or("Azure", "AWS", "GoogleCloud", "Planet", error="analyticsInfo: unknown storage type")
+            }
+        })
+
+class BaseObject(BaseDetection):
     """
     General valiator for single item (Ship/Plane)
     """
     def __init__(self, item):
         Validator.__init__(self, item, self.compose_schema())
     
-    def get_schema(self):
-        return ({
-            '_id': Or(str, Use(int)),
-            'company': str,
+    def comopse_schema(self):
+        schema = self.get_schema()
+        additional_parameters = {
             'geometry': {
                 'coordinates': list,
                 'type': Or("Point", "Polygon", error="geometry type: should be Point or Polygon")
             },
             'originalImageId': And(str, len),
-            'observed_start': datetime, 
-            'observed_end': datetime,
             'area': Or(float, int),
             'length': Or(float, int),
             'width': Or(float, int),
             Optional('score'): And(Use(float), lambda s: 0 <= s <= 1,error="score: should be between 0-1"),
             Optional('direction'): And(Use(float), lambda s: 0 <= s <= 360, error="direction: should be between 0-360")
-        })
+            
+        }
+        schema.update(additional_parameters)
+        return Schema(schema)
 
 
 class Ship(BaseObject):
@@ -84,40 +112,30 @@ def is_list_of_strings(ids):
     return all([isinstance(item, str) for item in ids])
 
 
-class BaseMap(Validator):
+class BaseMap(BaseDetection):
     """
     General validator for a raster item (Buildings, Roads, Vegetation)
     """
     def __init__(self, item):
         Validator.__init__(self, item, self.compose_schema())
     
-    def get_schema(self):
-        url_regex = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
-        storage_regex = r'(gs|s3)?://[-a-zA-Z0-9@:%._\+~#=]{2,256}/([\w\+~#=-]*/)*'
-
-        return ({
-            '_id': Or(str, Use(int)),
-            'company': str,
+    def compose_schema(self):
+        schema = self.get_schema()
+        additional_parameters = {
             'geometry': {
                 'coordinates': list,
                 'type': Or("Point", "Polygon", "MultiPolygon", "MultiPoint", error="geometry type error")
             },
-            'observed_start': datetime,
-            'observed_end': datetime,
-            Optional('analyticsInfo'): {
-                "url": Or(Regex(url_regex), Regex(storage_regex), error="analyticsInfo: invalid url"),
-                "storage": Or("Azure", "AWS", "GoogleCloud", "Planet", error="analyticsInfo: unknown storage type")
-            },
+
             Optional('sourceImagesInfo'): {
-                "url": Or(Regex(url_regex), Regex(storage_regex), error="sourceImagesInfo: invalid url"),
+                "url": Or(Regex(BaseDetection.url_regex), Regex(BaseDetection.storage_regex), error="sourceImagesInfo: invalid url"),
                 "storage": Or("Azure", "AWS", "GoogleCloud", error="sourceImagesInfo: unknown storage type")
             },
-            Optional('tileId'): {
-                "row": Or(str, Use(int)),
-                "col": Or(str, Use(int))
-            },
+
             Optional('sourceImagesIds'): And(list, lambda ids: is_list_of_strings(ids), error="sourceImagesIds: should be a list")
-        })
+        }
+        schema.update(additional_parameters)
+        return Schema(schema)
 
 
 class Building(BaseMap):
