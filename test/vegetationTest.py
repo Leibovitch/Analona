@@ -36,7 +36,7 @@ example = {
         ],
         "type": "Polygon"
     },
-    "analyticsInfo": {
+    "linkToSourceObject": {
         "url": "gs://spaceknow-customer46-delivery/weekly/aoi-1/r00c06/2018W45/20181115T072837_LANc",
         "storage": "GoogleCloud"
     },
@@ -54,7 +54,7 @@ res = Vegetation(bad_ids)
 assert(res.validate() == "sourceImagesIds: should be a list")
 
 bad_url = example
-bad_url["analyticsInfo"]["url"] = "1234://not.url"
+bad_url["linkToSourceObject"]["url"] = "1234://not.url"
 res = Vegetation(bad_url)
 assert(res.validate() == "analyticsInfo: invalid url")
 

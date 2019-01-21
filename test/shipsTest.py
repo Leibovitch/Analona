@@ -1,5 +1,8 @@
 from datetime import datetime
 import os,sys,inspect
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
@@ -47,6 +50,7 @@ example = {
         "IMO": "Aa123"
     }
 }
+
 
 res = Ship(example)
 assert(res.validate() == True)

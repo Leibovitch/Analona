@@ -1,5 +1,8 @@
 from datetime import datetime
 import os,sys,inspect
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
@@ -36,7 +39,7 @@ example = {
         ],
         "type": "Polygon"
     },
-    "analyticsInfo": {
+    "linkToSourceObject": {
         "url": "http://planet.com/abcd",
         "storage": "Azure"
     },
@@ -54,7 +57,7 @@ res = Building(bad_ids)
 assert(res.validate() == "sourceImagesIds: should be a list")
 
 bad_url = example
-bad_url["analyticsInfo"]["url"] = "1234://not.url"
+bad_url["linkToSourceObject"]["url"] = "1234://not.url"
 res = Building(bad_url)
 assert(res.validate() == "analyticsInfo: invalid url")
 
