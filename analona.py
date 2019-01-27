@@ -29,7 +29,7 @@ class Validator(object):
 
 class BaseDetection(Validator): 
     """
-    General valiator for a single detection (Ship/Plane)
+    General validator for a single detection (Ship/Plane)
     """
 
     url_regex = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
@@ -39,6 +39,8 @@ class BaseDetection(Validator):
             'company': str,
             'observed_start': datetime, 
             'observed_end': datetime,
+            'creation_time': datetime,
+            'update_time': datetime,
             Optional('tileId'): {
                 "row": Or(str, Use(int)),
                 "col": Or(str, Use(int)),
@@ -74,9 +76,7 @@ class BaseObject(BaseDetection):
             'width': Or(float, int),
             Optional('score'): And(Use(float), lambda s: 0 <= s <= 1,error="score: should be between 0-1"),
             Optional('direction'): And(Use(float), lambda s: 0 <= s <= 360, error="direction: should be between 0-360")
-            
         }
-
 
     @staticmethod   
     def compose_schema(schema):
@@ -196,3 +196,6 @@ class Vegetation(BaseMap):
 
     def __init__(self, item, schema = {}):
         BaseMap.__init__(self, item, Vegetation.compose_schema(schema))
+
+class SchemeException(Exception):
+    pass
