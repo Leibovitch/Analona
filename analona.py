@@ -41,7 +41,7 @@ class BaseDetection(Validator):
             'observed_end': datetime,
             'creation_time': datetime,
             'update_time': datetime,
-            Optional('tileId'): {
+            Optional('tile_id'): {
                 "row": Or(str, Use(int)),
                 "col": Or(str, Use(int)),
                 "full_id": str
@@ -49,7 +49,6 @@ class BaseDetection(Validator):
             Optional('linkToSourceObject'): {
                 "url": Or(Regex(url_regex), Regex(storage_regex), error="analyticsInfo: invalid url"),
                 "storage": Or("Azure", "AWS", "GoogleCloud", "Planet", error="analyticsInfo: unknown storage type")
-            
         }
     }
 
@@ -63,7 +62,7 @@ class BaseDetection(Validator):
 
 class BaseObject(BaseDetection):
     """
-    General valiator for single item (Ship/Plane)
+    General validator for single item (Ship/Plane)
     """
     unique_parameters = {
             'geometry': {
@@ -94,7 +93,6 @@ class Ship(BaseObject):
     unique_parameters = {
         Optional('AISIdentifiers'): {
             Optional('IMO'): Or(str, int),
-            Optional('IMO'): Or(str, int),
             Optional('GUID'): Or(str, int)
         }
     }
@@ -119,7 +117,7 @@ class Plane(BaseObject):
         return schema
 
     def __init__(self, item, schema = {}):
-        BaseObject.__init__(self, item, Plane.compose_schema(schema))
+        super().__init__(item, Plane.compose_schema(schema))
 
 
 def is_list_of_strings(ids):
@@ -152,7 +150,6 @@ class BaseMap(BaseDetection):
         schema.update(BaseMap.unique_parameters)
         return schema
 
-
 class Building(BaseMap):
     """
     Building Validator
@@ -165,8 +162,7 @@ class Building(BaseMap):
         return schema
 
     def __init__(self, item, schema = {}):
-        BaseMap.__init__(self, item, Building.compose_schema(schema))
-
+        super().__init__(item, Building.compose_schema(schema))
 
 class Road(BaseMap):
     """
@@ -180,7 +176,7 @@ class Road(BaseMap):
         return schema
 
     def __init__(self, item, schema = {}):
-        BaseMap.__init__(self, item, Road.compose_schema(schema))
+        super().__init__(item, Road.compose_schema(schema))
 
 
 class Vegetation(BaseMap):
@@ -195,7 +191,7 @@ class Vegetation(BaseMap):
         return schema
 
     def __init__(self, item, schema = {}):
-        BaseMap.__init__(self, item, Vegetation.compose_schema(schema))
+        super().__init__(item, Vegetation.compose_schema(schema))
 
 class SchemeException(Exception):
     pass
