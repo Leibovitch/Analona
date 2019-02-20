@@ -36,6 +36,7 @@ class BaseDetection(Validator):
     storage_regex = r'(gs|s3)?://[-a-zA-Z0-9@:%._\+~#=]{2,256}/([\w\+~#=-]*/)*'
     unique_parameters = {
             '_id': Or(str, Use(int)),
+            'collection': Or("ships", "buildings", "roads", "vegetation", "planes", error="analyticsInfo: unknowen collection name"),
             'company': Or("Planet", "OrbitalInsight", "SpaceKnow", "RadiantSolutions", error="analyticsInfo: unknown company name"),
             'observed_start': datetime, 
             'observed_end': datetime,
@@ -59,6 +60,8 @@ class BaseDetection(Validator):
 
     def __init__(self, item, schema = {}):
         super().__init__(item, BaseDetection.compose_schema(schema))
+
+
 
 class BaseObject(BaseDetection):
     """
