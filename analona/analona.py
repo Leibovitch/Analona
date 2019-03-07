@@ -35,21 +35,22 @@ class BaseDetection(Validator):
     url_regex = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
     storage_regex = r'(gs|s3)?://[-a-zA-Z0-9@:%._\+~#=]{2,256}/([\w\+~#=-]*/)*'
     unique_parameters = {
-            '_id': Or(str, Use(int)),
-            'collection': Or("ships", "buildings", "roads", "vegetation", "planes", error="analyticsInfo: unknowen collection name"),
-            'company': Or("Planet", "OrbitalInsight", "SpaceKnow", "RadiantSolutions", error="analyticsInfo: unknown company name"),
-            'observed_start': datetime, 
-            'observed_end': datetime,
-            'creation_time': datetime,
-            'update_time': datetime,
-            Optional('tile_id'): {
-                "row": Or(str, Use(int)),
-                "col": Or(str, Use(int)),
-                "full_id": str
-            },
-            Optional('linkToSourceObject'): {
-                "url": Or(Regex(url_regex), Regex(storage_regex), error="analyticsInfo: invalid url"),
-                "storage": Or("Azure", "AWS", "GoogleCloud", "Planet", error="analyticsInfo: unknown storage type")
+        '_id': Or(str, Use(int)),
+        'collection': Or("ships", "buildings", "roads", "vegetation", "planes", "changes", error="analyticsInfo: unknowen collection name"),
+        'company': Or("Planet", "OrbitalInsight", "SpaceKnow", "RadiantSolutions", error="analyticsInfo: unknown company name"),
+        'observed_start': datetime,
+        'observed_end': datetime,
+        'creation_time': datetime,
+        'update_time': datetime,
+        Optional('tile_id'): {
+            "row": Or(str, Use(int)),
+            "col": Or(str, Use(int)),
+            "full_id": str
+        },
+        Optional('score'): And(Use(float), lambda s: 0 <= s <= 1,error="score: should be between 0-1"),
+        Optional('linkToSourceObject'): {
+            "url": Or(Regex(url_regex), Regex(storage_regex), error="analyticsInfo: invalid url"),
+            "storage": Or("Azure", "AWS", "GoogleCloud", "Planet", error="analyticsInfo: unknown storage type")
         }
     }
 
@@ -61,24 +62,44 @@ class BaseDetection(Validator):
     def __init__(self, item, schema = {}):
         super().__init__(item, BaseDetection.compose_schema(schema))
 
+class ChangeDetection(BaseDetection):
+    """
+    General validator for change detection
+    """
 
+    unique_parameters = {
+        'geometry': {
+            'coordinates': list,
+            'type': Or("Point", "Polygon", error="geometry type: should be Point or Polygon"),
+        },
+        'ndviPre': Use(float),
+        'ndviPost': Use(float),
+        'changeType': Or("persistent")
+    }
+
+    @staticmethod
+    def compose_schema(schema):
+        schema.update(ChangeDetection.unique_parameters)
+        return schema
+
+    def __init__(self, item, schema = {}):
+        super().__init__(item, ChangeDetection.compose_schema(schema))
 
 class BaseObject(BaseDetection):
     """
     General validator for single item (Ship/Plane)
     """
     unique_parameters = {
-            'geometry': {
-                'coordinates': list,
-                'type': Or("Point", "Polygon", error="geometry type: should be Point or Polygon")
-            },
-            'originalImageId': And(str, len),
-            'area': Or(float, int),
-            'length': Or(float, int),
-            'width': Or(float, int),
-            Optional('score'): And(Use(float), lambda s: 0 <= s <= 1,error="score: should be between 0-1"),
-            Optional('direction'): And(Use(float), lambda s: 0 <= s <= 360, error="direction: should be between 0-360")
-        }
+        'geometry': {
+            'coordinates': list,
+            'type': Or("Point", "Polygon", error="geometry type: should be Point or Polygon")
+        },
+        'originalImageId': And(str, len),
+        'area': Or(float, int),
+        'length': Or(float, int),
+        'width': Or(float, int),
+        Optional('direction'): And(Use(float), lambda s: 0 <= s <= 360, error="direction: should be between 0-360")
+    }
 
     @staticmethod   
     def compose_schema(schema):
