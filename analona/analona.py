@@ -45,6 +45,7 @@ class BaseDetection(Validator):
         Optional('tile_id'): {
             "row": Or(str, Use(int)),
             "col": Or(str, Use(int)),
+            Optional("utm_zone"): Or(str, Use(int)),
             "full_id": str
         },
         Optional('score'): And(Use(float), lambda s: 0 <= s <= 1,error="score: should be between 0-1"),
@@ -72,6 +73,8 @@ class ChangeDetection(BaseDetection):
             'coordinates': list,
             'type': Or("Point", "Polygon", error="geometry type: should be Point or Polygon"),
         },
+        'area': Use(float),
+        'azimuth': Use(float),
         'ndviPre': Use(float),
         'ndviPost': Use(float),
         'changeType': Or("persistent")
